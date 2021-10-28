@@ -10,9 +10,6 @@ const PATHS = {
 
 const reusedConfigs = {
   mode: 'development',
-  output: {
-    path: PATHS.output
-  },
   module: {
     rules: [
       {
@@ -41,15 +38,41 @@ const reusedConfigs = {
 }
 
 const webConfig = { ...reusedConfigs }
-export const getBuildConfig = () => ([{
-  target: 'web',
-  // node: {
-  //   global: true
-  // },
-  entry: {
-    // NOTE: entry sort matters style cascading
-    static: './src/static.ts',
-    index: './src/index.ts'
+const serverConfig = { ...reusedConfigs }
+serverConfig.plugins = serverConfig.plugins.slice(1)
+
+export const getBuildConfig = () => ([
+  {
+    target: 'web',
+    // node: {
+    //   global: true
+    // },
+    entry: {
+      // NOTE: entry sort matters style cascading
+      static: './src/static.ts',
+      index: './src/index.ts'
+    },
+    output: {
+      path: PATHS.output
+    },
+    ...webConfig
   },
-  ...webConfig
-}])
+  {
+    target: 'node',
+    entry: {
+      server: './src/server.ts'
+    },
+    output: {
+      filename: '[name].cjs',
+      // @refer: https://webpack.js.org/configuration/output/#outputlibrarytarget
+      // @refer: https://webpack.js.org/configuration/output/#outputlibrarytype
+      // libraryTarget: 'umd',
+      library: {
+        name: 'MobiusLib',
+        type: 'commonjs2'
+      },
+      path: PATHS.output
+    },
+    ...serverConfig
+  }
+])

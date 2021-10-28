@@ -15,13 +15,13 @@ const empty = () => {
 }
 
 const webpackConfig = getWebpackConfig({ mode: BUILD_MODE })
-console.info('【webpackConfig】' + JSON.stringify(webpackConfig))
-const [webConfig] = webpackConfig
+// console.info('【webpackConfig】' + JSON.stringify(webpackConfig))
+const [webConfig, serverConfig] = webpackConfig
 
 const packRenderer = () => {
   return new Promise((resolve, reject) => {
     console.log('【pack web】 start...')
-    webpack(webConfig)
+    webpack([webConfig, serverConfig])
       .run((err, stats) => {
         // @see https://webpack.js.org/api/node/#error-handling
         if (err) {
@@ -60,6 +60,12 @@ const copy = () => {
       rootResolvePath('src/statics/images/beian.png'),
       rootResolvePath(resolvePathInDes('statics/images/beian.png'))
     )
+
+    copyFileSync(
+      rootResolvePath(resolvePathInDes('server.cjs')),
+      rootResolvePath('bin/_insights-notifier.cjs')
+    )
+
     console.log('【copy】 complete!')
     resolve()
   })

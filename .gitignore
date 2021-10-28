@@ -6,6 +6,7 @@ dist/
 release/
 typings/
 .temp
+*.memory-card.json
 
 # Logs
 logs

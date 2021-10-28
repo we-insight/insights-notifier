@@ -15,7 +15,7 @@ emptyDirSync(rootResolvePath(BUILD_TARGET_DES))
 // ref: https://github.com/webpack/webpack-dev-server/blob/master/examples/api/simple/server.js
 // ref: https://webpack.js.org/configuration/dev-server/
 const webpackConfig = getWebpackConfig({ mode: BUILD_MODE })
-console.info('【webpackConfig】' + JSON.stringify(webpackConfig))
+// console.info('【webpackConfig】' + JSON.stringify(webpackConfig))
 const devServerOptions = {
   headers: { 'Access-Control-Allow-Origin': '*' },
   https: false,
@@ -29,11 +29,12 @@ const devServerOptions = {
     aggregateTimeout: 1000
     // ignored: /node_modules/
   },
-  disableHostCheck: true
+  disableHostCheck: true,
+  historyApiFallback: true
 }
-console.info('【devServerOptions】' + JSON.stringify(devServerOptions))
+// console.info('【devServerOptions】' + JSON.stringify(devServerOptions))
 
-const [webConfig] = webpackConfig
+const [webConfig, serverConfig] = webpackConfig
 // refer: https://github.com/webpack-contrib/webpack-hot-middleware#multi-compiler-mode
 Object.entries(webConfig.entry).forEach(([key, value]) => {
   webConfig.entry[key] = [
@@ -42,6 +43,9 @@ Object.entries(webConfig.entry).forEach(([key, value]) => {
     value
   ]
 })
+// Object.entries(serverConfig.entry).forEach(([key, value]) => {
+//   serverConfig.entry[key] = [`webpack-hot-middleware/client?name=${key}`, 'webpack/hot/dev-server', value]
+// })
 
 let hotMiddleware
 const startWeb = () => {
@@ -101,8 +105,36 @@ const startWeb = () => {
   })
 }
 
+const startServer = () => {
+  return new Promise((resolve, reject) => {
+    const compiler = webpack(serverConfig)
+
+    compiler.hooks.watchRun.tapAsync('watch-run', (compilation, done) => {
+      console.log('【main】', 'compiling...')
+      hotMiddleware.publish({ action: 'compiling' })
+      done()
+    })
+
+    compiler.watch({}, (err, stats) => {
+      if (err) {
+        console.log(err)
+        return
+      }
+
+      copyFileSync(
+        rootResolvePath(resolvePathInDes('server.cjs')),
+        rootResolvePath('bin/_insights-notifier.cjs')
+      )
+
+      console.log('【main】 compiled!')
+
+      resolve()
+    })
+  })
+}
+
 const start = () => {
-  Promise.all([startWeb()])
+  Promise.all([startWeb(), startServer()])
     .catch(err => {
       console.error(err)
     })

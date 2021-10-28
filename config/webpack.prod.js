@@ -1,5 +1,4 @@
 import { rootResolvePath } from '../scripts/utils.js'
-import { getMobiusConfig } from './mobius.config.js'
 import { getProductionLoaders } from './loaders.config.js'
 import { getProductionPlugins } from './plugins.config.js'
 
@@ -15,11 +14,6 @@ const PATHS = {
 
 const reusedConfigs = {
   mode: 'production',
-  output: {
-    filename: '[name].js',
-    path: PATHS.output,
-    publicPath: getMobiusConfig().publicPath
-  },
   module: {
     rules: [
       {
@@ -68,7 +62,7 @@ const reusedConfigs = {
           sourceMap: true,
           compress: {
             drop_debugger: true,
-            drop_console: true
+            drop_console: false
           },
           format: {
             comments: false
@@ -82,16 +76,41 @@ const reusedConfigs = {
 }
 
 const webConfig = { ...reusedConfigs }
+const serverConfig = { ...reusedConfigs }
+serverConfig.plugins = serverConfig.plugins.slice(2)
 
-export const getProductionConfig = () => ([{
-  target: 'web',
-  // node: {
-  //   global: true
-  // },
-  entry: {
+export const getProductionConfig = () => ([
+  {
+    target: 'web',
+    // node: {
+    //   global: true
+    // },
+    entry: {
     // NOTE: entry sort matters style cascading
-    static: './src/static.ts',
-    index: './src/index.ts'
+      static: './src/static.ts',
+      index: './src/index.ts'
+    },
+    output: {
+      path: PATHS.output
+    },
+    ...webConfig
   },
-  ...webConfig
-}])
+  {
+    target: 'node',
+    entry: {
+      server: './src/server.ts'
+    },
+    output: {
+      filename: '[name].cjs',
+      // @refer: https://webpack.js.org/configuration/output/#outputlibrarytarget
+      // @refer: https://webpack.js.org/configuration/output/#outputlibrarytype
+      // libraryTarget: 'umd',
+      library: {
+        name: 'MobiusLib',
+        type: 'commonjs2'
+      },
+      path: PATHS.output
+    },
+    ...serverConfig
+  }
+])
