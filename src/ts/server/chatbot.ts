@@ -10,6 +10,7 @@ const WECHATY_PUPPET = 'wechaty-puppet-wechat'
 const initializeEnv = (): void => {
   process.env.WECHATY_PUPPET = WECHATY_PUPPET
   process.env.WECHATY_LOG = 'verbose'
+  process.env.PUPPETEER_SKIP_DOWNLOAD = 'true'
 }
 
 const setQr = (qr: string): void => {
@@ -93,9 +94,10 @@ export const chatbotStarter = (contexts: starterContexts): void => {
     chatbot.start()
       .then(() => {
         log.info('[Chatbot]', 'Starter Bot Started.')
-        chatbotEmitter.emit('login', {})
       })
       .catch((e: Error) => log.error('[Chatbot]', e))
+
+    chatbotEmitter.emit('login', {})
   })
 
   listenerEmitter.addListener('logout', () => {
