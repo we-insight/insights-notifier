@@ -16,7 +16,9 @@
   <a href="./docs/readme_zh.md" style="color: hsla(264, 100%, 50%, 100%);">📜 中文文档</a>
 </p>
 
-<h1 align="center">Lib Name</h1>
+<h1 align="center">Insights Notifier</h1>
+
+> You can currently read <a href="./docs/readme_zh.md" style="color: hsla(264, 100%, 50%, 100%);">📜 中文文档</a>.
 
 🎨 One sentence introduction to the project.
 

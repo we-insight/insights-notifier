@@ -16,11 +16,9 @@
   <span style="font-weight: bold; color: hsla(96, 100%, 50%, 100%);">📜 中文文档</span>
 </p>
 
-<h1 align="center">项目名称</h1>
+<h1 align="center">Insights Notifier</h1>
 
-🎨 一句话介绍项目。
-
-稍微详细一点的项目描述。
+🎨 一个消息推送工具，部署之后可以通过 API 给系统发送消息，系统会将消息分发到目标平台（微信等）。
 
 ## 预览
 
